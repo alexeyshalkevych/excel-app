@@ -5,17 +5,23 @@ const CODES = {
 
 const toChar = (_, index) => String.fromCharCode(CODES.A + index);
 
-const toCell = content => `
-  <div class="cell" contenteditable>${content}</div>  
+const toCell = (_, col) => `
+  <div class="cell" contenteditable data-col="${col}"></div>  
 `;
 
-const toColumn = content => `
-  <div class="column">${content}</div>
+const toColumn = (content, index) => `
+  <div class="column" data-type="resizable" data-col="${index}">
+    ${content}
+    <div class="column__resize" data-resize="col"></div>
+  </div>
 `;
 
 const createRowMarkup = (index, content) => `
-  <div class="row">
-    <div class="row__info">${index ? index : ''}</div>
+  <div class="row" data-type="resizable">
+    <div class="row__info">
+      ${index ? index : ''}
+      ${index ? '<div class="row__resize" data-resize="row"></div>' : ''}
+    </div>
     <div class="row__data">${content}</div>
   </div>
 `;
