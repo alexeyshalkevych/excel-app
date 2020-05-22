@@ -5,8 +5,14 @@ const CODES = {
 
 const toChar = (_, index) => String.fromCharCode(CODES.A + index);
 
-const toCell = (_, col) => `
-  <div class="cell" contenteditable data-col="${col}"></div>  
+const toCell = row => (_, col) => `
+  <div 
+    class="cell" 
+    contenteditable 
+    data-col="${col}" 
+    data-type="cell"
+    data-id="${row}:${col}"
+  ></div>  
 `;
 
 const toColumn = (content, index) => `
@@ -38,10 +44,10 @@ const createTable = (rowsCount = 15) => {
 
   rows.push(createRowMarkup(null, columns));
 
-  for (let index = 0; index < rowsCount; index++) {
-    const cells = new Array(columnsCount).fill('').map(toCell).join('');
+  for (let row = 0; row < rowsCount; row++) {
+    const cells = new Array(columnsCount).fill('').map(toCell(row)).join('');
 
-    rows.push(createRowMarkup(index + 1, cells));
+    rows.push(createRowMarkup(row + 1, cells));
   }
 
   return rows.join('');
