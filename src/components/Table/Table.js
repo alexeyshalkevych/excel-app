@@ -4,6 +4,9 @@ import createTable from './table.template';
 import handleResize from './table.resize';
 import { shouldResize, isCell, matrix, nextSelector } from './table.functions';
 import TableSelection from './TableSelection';
+import * as actions from '../../redux/actions/actions';
+import { defaultStyles } from '../../constants/defaultStyles';
+import parse from '../../core/parse';
 
 class Table extends ExcelComponent {
   static className = 'excel__table';
@@ -17,7 +20,7 @@ class Table extends ExcelComponent {
   }
 
   toHTML() {
-    return createTable(25);
+    return createTable(25, this.store.getState());
   }
 
   prepare() {
@@ -29,23 +32,45 @@ class Table extends ExcelComponent {
 
     this.selectCell(this.$root.find('[data-id="0:0"]'));
 
-    this.$on('formula:input', text => {
-      this.selection.current.text(text);
+    this.$on('formula:input', value => {
+      this.selection.current.attr('data-value', value).text(parse(value));
+      this.updateTextInStore(value);
     });
 
     this.$on('formula:done', () => {
       this.selection.current.focus();
+    });
+
+    this.$on('toolbar:applyStyle', value => {
+      this.selection.applyStyle(value);
+      this.$dispatch(
+        actions.applyStyle({
+          value,
+          ids: this.selection.selectedIds,
+        }),
+      );
     });
   }
 
   selectCell($cell) {
     this.selection.select($cell);
     this.$emit('table:select', $cell);
+    const styles = $cell.getStyles(Object.keys(defaultStyles));
+    this.$dispatch(actions.changeStyles(styles));
+  }
+
+  async resizeTable(event) {
+    try {
+      const data = await handleResize(this.$root, event);
+      this.$dispatch(actions.tableResize(data));
+    } catch (error) {
+      console.warn('Resize error: ', error.message);
+    }
   }
 
   onMousedown(event) {
     if (shouldResize(event)) {
-      handleResize(this.$root, event);
+      this.resizeTable(event);
     } else if (isCell(event)) {
       const $target = $(event.target);
 
@@ -55,7 +80,7 @@ class Table extends ExcelComponent {
         );
         this.selection.selectGroup($cells);
       } else {
-        this.selection.select($target);
+        this.selectCell($target);
       }
     }
   }
@@ -81,8 +106,17 @@ class Table extends ExcelComponent {
     }
   }
 
+  updateTextInStore(value) {
+    this.$dispatch(
+      actions.changeText({
+        id: this.selection.current.id(),
+        value,
+      }),
+    );
+  }
+
   onInput(event) {
-    this.$emit('table:input', $(event.target));
+    this.updateTextInStore($(event.target).text());
   }
 }
 

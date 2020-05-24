@@ -5,6 +5,8 @@ class ExcelComponent extends DomListener {
     super($root, options.listeners);
     this.name = options.name || '';
     this.emitter = options.emitter;
+    this.subscribe = options.subscribe || [];
+    this.store = options.store;
     this.unsubscribers = [];
 
     this.prepare();
@@ -23,6 +25,16 @@ class ExcelComponent extends DomListener {
   $on(event, callback) {
     const unsub = this.emitter.subscribe(event, callback);
     this.unsubscribers.push(unsub);
+  }
+
+  $dispatch(action) {
+    this.store.dispatch(action);
+  }
+
+  storeChanged() {}
+
+  isWatching(key) {
+    return this.subscribe.includes(key);
   }
 
   init() {
