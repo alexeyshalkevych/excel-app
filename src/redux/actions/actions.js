@@ -4,6 +4,7 @@ import {
   CHANGE_STYLES,
   APPLY_STYLE,
   CHANGE_TITLE,
+  UPDATE_DATE,
 } from '../../constants/actionTypes';
 
 export const tableResize = data => ({
@@ -29,4 +30,8 @@ export const applyStyle = data => ({
 export const changeTitle = data => ({
   type: CHANGE_TITLE,
   payload: data,
+});
+
+export const updateDate = () => ({
+  type: UPDATE_DATE,
 });

@@ -4,6 +4,7 @@ import {
   CHANGE_STYLES,
   APPLY_STYLE,
   CHANGE_TITLE,
+  UPDATE_DATE,
 } from '../../constants/actionTypes';
 
 const rootReducer = (state, { type, payload }) => {
@@ -40,6 +41,10 @@ const rootReducer = (state, { type, payload }) => {
 
     case CHANGE_TITLE:
       return { ...state, title: payload };
+
+    case UPDATE_DATE: {
+      return { ...state, openedDate: new Date().toJSON() };
+    }
     default:
       return state;
   }

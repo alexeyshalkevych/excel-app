@@ -52,3 +52,11 @@ export const debounce = (callback, wait) => {
     timeout = setTimeout(later, wait);
   };
 };
+
+export const storageName = param => `excel:${param}`;
+
+export const clone = obj => JSON.parse(JSON.stringify(obj));
+
+export const preventDefault = event => {
+  event.preventDefault();
+};
